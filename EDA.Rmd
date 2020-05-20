@@ -8,6 +8,7 @@ output: html_notebook
 ```{r}
 library(tidyverse)
 library(readxl)
+library(janitor)
 ```
 
 # Load file
@@ -19,15 +20,20 @@ glimpse(raw_game_data)
 ```
 
 #Data cleaning
-a. show number of unique values in every column 
+1. Clean col names with janitor (make em more "R way")
+2. Show number of unique values in every column 
+3. Remove columns containing only 1 value 
 
 ```{r}
-number_of_unique_values_in_col <- raw_game_data %>% 
+data_clean_names <- janitor::clean_names(raw_game_data)
+
+number_of_unique_values_in_col <- data_clean_names %>% 
   summarise_all(n_distinct) %>%
   pivot_longer(cols = everything(),
                names_to = "n_distinct")
 
-
+data_column_choice <- data_clean_names %>%
+  select()
                 
 
 ```

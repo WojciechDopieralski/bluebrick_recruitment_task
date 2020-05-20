@@ -1753,10 +1753,18 @@ summary {
 <h1>Load packages</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5saWJyYXJ5KHJlYWR4bClcbmBgYCJ9 -->
-<pre class="r"><code>library(tidyverse)
-library(readxl)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShqYW5pdG9yKVxuXG5gYGAifQ== -->
+<pre class="r"><code>library(janitor)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5Eb+aIvOO4s+aIvOO4uWN6YW5pZSBwYWtpZXR1OiDjpLzjuLFqYW5pdG9y46S847iyXG5cbk5hc3TmlLzjuaFwdWrmiLzjuLljZSBvYmlla3R5IHpvc3Rh5oi847izeSB6YWtyeXRlIHog46S847ixcGFja2FnZTpzdGF0c+OkvOO4sjpcblxuICAgIGNoaXNxLnRlc3QsIGZpc2hlci50ZXN0XG4ifQ== -->
+<pre><code>
+Do戼㸳戼㸹czanie pakietu: 㤼㸱janitor㤼㸲
+
+Nast攼㹡puj戼㸹ce obiekty zosta戼㸳y zakryte z 㤼㸱package:stats㤼㸲:
+
+    chisq.test, fisher.test</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1771,7 +1779,7 @@ glimpse(raw_game_data)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>#Data cleaning a. show number of unique values in every column</p>
+<p>#Data cleaning 1. Clean col names with janitor (make em more “R way”) 2. Show number of unique values in every column 3. Remove columns containing only 1 value</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibmNvbCI6MiwibnJvdyI6MTl9LCJyZGYiOiJINHNJQUFBQUFBQUFCbVZTWFVyRFFCQ2VwazIxOGEvaWsyOEJRUlN4YXRVRGFBdmlpNFMyaW0reUptc05wcnRsZDZNVkJEMkVaL0JHSHNNcnRNN1dIYkh4NFV0bXZueVRiMmRtTyszcncrQTZBSUF5bEtzSUgwT290cUtENXZFK1FNWERyQVFWcU5uM0NGVnJHRml5amxoekh5cHRacmlMNXlJV1A3QStwWXVSa2trZW02M3o5c1oyZ1FzdjJJQjBsZDd6a09MNUtHUG1UcW9CNlZzeUYwWTloeTJaL05vNHpxWFZEdStuVXJpc2ZxYWsxdUdsU0kwT3V6SkxxS2pEVGE2RWR1bnlCVGYvUmNFcDB6eU1WQnFUVjlCbDJTd3ozOHFWNGlJbSs5VWZRNnZUNGRabHQwMnRMam5IV2ZMcXBMZlhZNk1aY3NVZTV1OFBVRGNkTWNETGRBZXpLQ05lSFJZUUg0Z2p4Q2RpQi9HTzJBU29qVkc2anAwUFVOWXY3Tk1YT0gvdGR1bFJzK0ltU2JWSlJXeEk5c2l5bkJkcWEwbytOYWplSHRSN3c4ZGtNdmtxbXNRWjAyUkNaSkF3d3hwM3l1NGZZRndvbVpORGc4dkVJcysyN3hlS1M2cEFyT1RDbmlUWmplOXo4YkRidEFadVRPQk9WM0tqcE5qN3NmUW03bGMrM1NNdStxbWdOZnNadStVWjNSYnNlTnB3WTZoU1FjTUprTlVOSXcwalhSRExqSmhwYnpEK0JoSU1iNlZsQXdBQSJ9 -->
@@ -1786,7 +1794,7 @@ glimpse(raw_game_data)</code></pre>
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogImdhbWVfc2FsZXNfYW5hbHlzaXMiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIExvYWQgcGFja2FnZXMNCg0KYGBge3J9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkocmVhZHhsKQ0KYGBgDQoNCiMgTG9hZCBmaWxlDQoNCmBgYHtyfQ0KcmF3X2dhbWVfZGF0YSA8LSByZWFkeGw6OnJlYWRfeGxzeCgicmF3X2RhdGEvUmVjcnV0aW1lbnQgdGFzayAtIGRhdGEgc2V0Lnhsc3giKQ0KDQpnbGltcHNlKHJhd19nYW1lX2RhdGEpDQpgYGANCg0KI0RhdGEgY2xlYW5pbmcNCmEuIHNob3cgbnVtYmVyIG9mIHVuaXF1ZSB2YWx1ZXMgaW4gZXZlcnkgY29sdW1uIA0KDQpgYGB7cn0NCm51bWJlcl9vZl91bmlxdWVfdmFsdWVzX2luX2NvbCA8LSByYXdfZ2FtZV9kYXRhICU+JSANCiAgc3VtbWFyaXNlX2FsbChuX2Rpc3RpbmN0KSAlPiUNCiAgcGl2b3RfbG9uZ2VyKGNvbHMgPSBldmVyeXRoaW5nKCksDQogICAgICAgICAgICAgICBuYW1lc190byA9ICJuX2Rpc3RpbmN0IikNCg0KDQogICAgICAgICAgICAgICAgDQoNCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogImdhbWVfc2FsZXNfYW5hbHlzaXMiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIExvYWQgcGFja2FnZXMNCg0KYGBge3J9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkocmVhZHhsKQ0KbGlicmFyeShqYW5pdG9yKQ0KYGBgDQoNCiMgTG9hZCBmaWxlDQoNCmBgYHtyfQ0KcmF3X2dhbWVfZGF0YSA8LSByZWFkeGw6OnJlYWRfeGxzeCgicmF3X2RhdGEvUmVjcnV0aW1lbnQgdGFzayAtIGRhdGEgc2V0Lnhsc3giKQ0KDQpnbGltcHNlKHJhd19nYW1lX2RhdGEpDQpgYGANCg0KI0RhdGEgY2xlYW5pbmcNCjEuIENsZWFuIGNvbCBuYW1lcyB3aXRoIGphbml0b3IgKG1ha2UgZW0gbW9yZSAiUiB3YXkiKQ0KMi4gU2hvdyBudW1iZXIgb2YgdW5pcXVlIHZhbHVlcyBpbiBldmVyeSBjb2x1bW4gDQozLiBSZW1vdmUgY29sdW1ucyBjb250YWluaW5nIG9ubHkgMSB2YWx1ZSANCg0KYGBge3J9DQpkYXRhX2NsZWFuX25hbWVzIDwtIGphbml0b3I6OmNsZWFuX25hbWVzKHJhd19nYW1lX2RhdGEpDQoNCm51bWJlcl9vZl91bmlxdWVfdmFsdWVzX2luX2NvbCA8LSBkYXRhX2NsZWFuX25hbWVzICU+JSANCiAgc3VtbWFyaXNlX2FsbChuX2Rpc3RpbmN0KSAlPiUNCiAgcGl2b3RfbG9uZ2VyKGNvbHMgPSBldmVyeXRoaW5nKCksDQogICAgICAgICAgICAgICBuYW1lc190byA9ICJuX2Rpc3RpbmN0IikNCg0KZGF0YV9jb2x1bW5fY2hvaWNlIDwtIGRhdGFfY2xlYW5fbmFtZXMgJT4lDQogIHNlbGVjdCgpDQogICAgICAgICAgICAgICAgDQoNCmBgYA0KDQo=</div>
 
 
 
