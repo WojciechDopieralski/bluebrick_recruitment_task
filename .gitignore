@@ -37,3 +37,9 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+#Content of recruitment task 
+task
+
+#Raw data for task
+raw_data
