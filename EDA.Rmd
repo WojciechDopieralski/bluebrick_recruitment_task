@@ -7,7 +7,28 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
+library(readxl)
+```
 
+# Load file
+
+```{r}
+raw_game_data <- readxl::read_xlsx("raw_data/Recrutiment task - data set.xlsx")
+
+glimpse(raw_game_data)
+```
+
+#Data cleaning
+a. show number of unique values in every column 
+
+```{r}
+number_of_unique_values_in_col <- raw_game_data %>% 
+  summarise_all(n_distinct) %>%
+  pivot_longer(cols = everything(),
+               names_to = "n_distinct")
+
+
+                
 
 ```
 

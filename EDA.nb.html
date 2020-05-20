@@ -1753,33 +1753,40 @@ summary {
 <h1>Load packages</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5saWJyYXJ5KHJlYWR4bClcbmBgYCJ9 -->
 <pre class="r"><code>library(tidyverse)
-</code></pre>
+library(readxl)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2Qgb3ZlcndyaXR0ZW4gYnkgJ2RwbHlyJzpcbiAgbWV0aG9kICAgICAgICAgICBmcm9tXG4gIHByaW50LnJvd3dpc2VfZGYgICAgIFxuUmVnaXN0ZXJlZCBTMyBtZXRob2RzIG92ZXJ3cml0dGVuIGJ5ICdkYnBseXInOlxuICBtZXRob2QgICAgICAgICBmcm9tXG4gIHByaW50LnRibF9sYXp5ICAgICBcbiAgcHJpbnQudGJsX3NxbCAgICAgIFxuXHUwMDFiWzMwbS0tIFx1MDAxYlsxbUF0dGFjaGluZyBwYWNrYWdlc1x1MDAxYlsyMm0gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIHRpZHl2ZXJzZSAxLjMuMCAtLVx1MDAxYlszOW1cblx1MDAxYlszMG1cdTAwMWJbMzJtPFUrMjIxQT5cdTAwMWJbMzBtIFx1MDAxYlszNG1nZ3Bsb3QyXHUwMDFiWzMwbSAzLjMuMCAgICAgXHUwMDFiWzMybTxVKzIyMUE+XHUwMDFiWzMwbSBcdTAwMWJbMzRtcHVycnIgIFx1MDAxYlszMG0gMC4zLjRcblx1MDAxYlszMm08VSsyMjFBPlx1MDAxYlszMG0gXHUwMDFiWzM0bXRpYmJsZSBcdTAwMWJbMzBtIDMuMC4xICAgICBcdTAwMWJbMzJtPFUrMjIxQT5cdTAwMWJbMzBtIFx1MDAxYlszNG1kcGx5ciAgXHUwMDFiWzMwbSAwLjguNVxuXHUwMDFiWzMybTxVKzIyMUE+XHUwMDFiWzMwbSBcdTAwMWJbMzRtdGlkeXIgIFx1MDAxYlszMG0gMS4wLjIgICAgIFx1MDAxYlszMm08VSsyMjFBPlx1MDAxYlszMG0gXHUwMDFiWzM0bXN0cmluZ3JcdTAwMWJbMzBtIDEuNC4wXG5cdTAwMWJbMzJtPFUrMjIxQT5cdTAwMWJbMzBtIFx1MDAxYlszNG1yZWFkciAgXHUwMDFiWzMwbSAxLjMuMSAgICAgXHUwMDFiWzMybTxVKzIyMUE+XHUwMDFiWzMwbSBcdTAwMWJbMzRtZm9yY2F0c1x1MDAxYlszMG0gMC41LjBcdTAwMWJbMzltXG5cdTAwMWJbMzBtLS0gXHUwMDFiWzFtQ29uZmxpY3RzXHUwMDFiWzIybSAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gdGlkeXZlcnNlX2NvbmZsaWN0cygpIC0tXG5cdTAwMWJbMzFteFx1MDAxYlszMG0gXHUwMDFiWzM0bWRwbHlyXHUwMDFiWzMwbTo6XHUwMDFiWzMybWZpbHRlcigpXHUwMDFiWzMwbSBtYXNrcyBcdTAwMWJbMzRtc3RhdHNcdTAwMWJbMzBtOjpmaWx0ZXIoKVxuXHUwMDFiWzMxbXhcdTAwMWJbMzBtIFx1MDAxYlszNG1kcGx5clx1MDAxYlszMG06Olx1MDAxYlszMm1sYWcoKVx1MDAxYlszMG0gICAgbWFza3MgXHUwMDFiWzM0bXN0YXRzXHUwMDFiWzMwbTo6bGFnKClcdTAwMWJbMzltXG4ifQ== -->
-<pre><code>Registered S3 method overwritten by &#39;dplyr&#39;:
-  method           from
-  print.rowwise_df     
-Registered S3 methods overwritten by &#39;dbplyr&#39;:
-  method         from
-  print.tbl_lazy     
-  print.tbl_sql      
-[30m-- [1mAttaching packages[22m --------------------------------------- tidyverse 1.3.0 --[39m
-[30m[32m&lt;U+221A&gt;[30m [34mggplot2[30m 3.3.0     [32m&lt;U+221A&gt;[30m [34mpurrr  [30m 0.3.4
-[32m&lt;U+221A&gt;[30m [34mtibble [30m 3.0.1     [32m&lt;U+221A&gt;[30m [34mdplyr  [30m 0.8.5
-[32m&lt;U+221A&gt;[30m [34mtidyr  [30m 1.0.2     [32m&lt;U+221A&gt;[30m [34mstringr[30m 1.4.0
-[32m&lt;U+221A&gt;[30m [34mreadr  [30m 1.3.1     [32m&lt;U+221A&gt;[30m [34mforcats[30m 0.5.0[39m
-[30m-- [1mConflicts[22m ------------------------------------------ tidyverse_conflicts() --
-[31mx[30m [34mdplyr[30m::[32mfilter()[30m masks [34mstats[30m::filter()
-[31mx[30m [34mdplyr[30m::[32mlag()[30m    masks [34mstats[30m::lag()[39m</code></pre>
-<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="load-file" class="section level1">
+<h1>Load file</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmF3X2dhbWVfZGF0YSA8LSByZWFkeGw6OnJlYWRfeGxzeChcInJhd19kYXRhL1JlY3J1dGltZW50IHRhc2sgLSBkYXRhIHNldC54bHN4XCIpXG5cbmdsaW1wc2UocmF3X2dhbWVfZGF0YSlcbmBgYCJ9 -->
+<pre class="r"><code>raw_game_data &lt;- readxl::read_xlsx(&quot;raw_data/Recrutiment task - data set.xlsx&quot;)
+
+glimpse(raw_game_data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>#Data cleaning a. show number of unique values in every column</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibmNvbCI6MiwibnJvdyI6MTl9LCJyZGYiOiJINHNJQUFBQUFBQUFCbVZTWFVyRFFCQ2VwazIxOGEvaWsyOEJRUlN4YXRVRGFBdmlpNFMyaW0reUptc05wcnRsZDZNVkJEMkVaL0JHSHNNcnRNN1dIYkh4NFV0bXZueVRiMmRtTyszcncrQTZBSUF5bEtzSUgwT290cUtENXZFK1FNWERyQVFWcU5uM0NGVnJHRml5amxoekh5cHRacmlMNXlJV1A3QStwWXVSa2trZW02M3o5c1oyZ1FzdjJJQjBsZDd6a09MNUtHUG1UcW9CNlZzeUYwWTloeTJaL05vNHpxWFZEdStuVXJpc2ZxYWsxdUdsU0kwT3V6SkxxS2pEVGE2RWR1bnlCVGYvUmNFcDB6eU1WQnFUVjlCbDJTd3ozOHFWNGlJbSs5VWZRNnZUNGRabHQwMnRMam5IV2ZMcXBMZlhZNk1aY3NVZTV1OFBVRGNkTWNETGRBZXpLQ05lSFJZUUg0Z2p4Q2RpQi9HTzJBU29qVkc2anAwUFVOWXY3Tk1YT0gvdGR1bFJzK0ltU2JWSlJXeEk5c2l5bkJkcWEwbytOYWplSHRSN3c4ZGtNdmtxbXNRWjAyUkNaSkF3d3hwM3l1NGZZRndvbVpORGc4dkVJcysyN3hlS1M2cEFyT1RDbmlUWmplOXo4YkRidEFadVRPQk9WM0tqcE5qN3NmUW03bGMrM1NNdStxbWdOZnNadStVWjNSYnNlTnB3WTZoU1FjTUprTlVOSXcwalhSRExqSmhwYnpEK0JoSU1iNlZsQXdBQSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["n_distinct"],"name":[1],"type":["chr"],"align":["left"]},{"label":["value"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"Date","2":"124"},{"1":"Package","2":"1"},{"1":"Product(ID#)","2":"1"},{"1":"Product Name","2":"1"},{"1":"Type","2":"1"},{"1":"Platform","2":"3"},{"1":"Country Code","2":"127"},{"1":"Country","2":"127"},{"1":"Region","2":"11"},{"1":"Gross Units Sold","2":"166"},{"1":"Returns","2":"52"},{"1":"Net Units Sold","2":"213"},{"1":"Base Price","2":"43"},{"1":"Sale Price","2":"148"},{"1":"Currency","2":"38"},{"1":"Gross Sales (USD)","2":"2558"},{"1":"Returns (USD)","2":"793"},{"1":"VAT/Tax (USD)","2":"1901"},{"1":"Net Sales (USD)","2":"2919"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[19]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogImdhbWVfc2FsZXNfYW5hbHlzaXMiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIExvYWQgcGFja2FnZXMNCg0KYGBge3J9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCg0KDQpgYGANCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogImdhbWVfc2FsZXNfYW5hbHlzaXMiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIExvYWQgcGFja2FnZXMNCg0KYGBge3J9DQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkocmVhZHhsKQ0KYGBgDQoNCiMgTG9hZCBmaWxlDQoNCmBgYHtyfQ0KcmF3X2dhbWVfZGF0YSA8LSByZWFkeGw6OnJlYWRfeGxzeCgicmF3X2RhdGEvUmVjcnV0aW1lbnQgdGFzayAtIGRhdGEgc2V0Lnhsc3giKQ0KDQpnbGltcHNlKHJhd19nYW1lX2RhdGEpDQpgYGANCg0KI0RhdGEgY2xlYW5pbmcNCmEuIHNob3cgbnVtYmVyIG9mIHVuaXF1ZSB2YWx1ZXMgaW4gZXZlcnkgY29sdW1uIA0KDQpgYGB7cn0NCm51bWJlcl9vZl91bmlxdWVfdmFsdWVzX2luX2NvbCA8LSByYXdfZ2FtZV9kYXRhICU+JSANCiAgc3VtbWFyaXNlX2FsbChuX2Rpc3RpbmN0KSAlPiUNCiAgcGl2b3RfbG9uZ2VyKGNvbHMgPSBldmVyeXRoaW5nKCksDQogICAgICAgICAgICAgICBuYW1lc190byA9ICJuX2Rpc3RpbmN0IikNCg0KDQogICAgICAgICAgICAgICAgDQoNCmBgYA0KDQo=</div>
 
 
 
