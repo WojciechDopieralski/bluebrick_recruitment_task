@@ -6,9 +6,14 @@ output: html_notebook
 # Load packages
 
 ```{r}
+# Data wrangling
 library(tidyverse)
-library(readxl)
 library(janitor)
+# Data loading/saving
+library(readxl)
+# Fro currency
+library(formattable)
+
 ```
 
 # Load file
@@ -22,7 +27,10 @@ glimpse(raw_game_data)
 #Data cleaning
 1. Clean col names with janitor (make em more "R way")
 2. Show number of unique values in every column 
-3. Remove columns containing only 1 value 
+3. Remove columns containing only 1 value. Create factor columns for further analysis. 
+4. Create Map table with country code and country name.
+5. Create column that shows if game is promoted (near is better than "==" cos of floats.). Add % of discount in country curr
+6. Split data set by years 
 
 ```{r}
 data_clean_names <- janitor::clean_names(raw_game_data)
@@ -33,8 +41,145 @@ number_of_unique_values_in_col <- data_clean_names %>%
                names_to = "n_distinct")
 
 data_column_choice <- data_clean_names %>%
-  select()
+  select(- package, -product_name, -type, -product_id_number) %>%
+  mutate_if(~(is_character(.) & n_distinct(.) <= 130), as.factor)
+
+country_map_table <- data_column_choice %>%
+  select(country_code, country)
                 
+game_is_promo <- data_column_choice %>%
+  select(-country) %>%
+  mutate(
+    is_promo = !(near(base_price, sale_price)),
+    discount = ifelse(is_promo, round((1-(sale_price/base_price))*100),0)
+  ) %>%
+  arrange(country_code)
+
+first_sales <- game_is_promo %>%
+  filter(date < '2017-02-02')
+
+second_sales <- game_is_promo %>%
+  filter(date > '2017-02-02')
+```
+
+# Grouping data 
+1. Group data by platform 
+
+```{r}
+options(scipen = 999)
+
+discount_by_platform <- first_sales %>%
+  group_by(platform, discount) %>%
+  summarise(numb = n(), sum_net = sum(net_sales_usd)) %>%
+  mutate(perc_group = numb/sum(numb), sum_net_group_perc = sum_net/sum(sum_net)) %>%
+  ungroup() %>%
+  mutate(perc_ungroup = numb/sum(numb), sum_net_ungroup = sum_net/sum(sum_net))
+
+discount_by_platform_whole_data <- count_occurency_of_platform(game_is_promo, platform, discount)
+
+
+
+test_fun <- count_param(first_sales,x = returns_usd, platform, discount)
+
+count_param <- function(data, x, ...) {
+  col_name <- enquo(x)
+  
+  result <- data %>%
+    group_by(...) %>%
+    summarise(numb = n(), sum_net = sum(!!col_name)) %>%
+    mutate(count_sum_group = sum_net/sum(sum_net)) %>%
+    ungroup() %>%
+    mutate(count_sum_ungroup = sum_net/sum(sum_net))
+}
+
+
+discount_new_group <- game_is_promo %>%
+  mutate(new_groups = case_when(
+    discount == 0 ~ "0",
+    discount > 0 & discount < 30 ~ "29-",
+    discount >= 30 & discount < 40 ~ "30~39",
+    discount >= 40 & discount < 50 ~ "40-49",
+    discount >= 50 & discount < 59 ~ "50~59",
+    discount >= 60 ~ "60+")
+   )
+
+# ggplot(discount_new_group, aes(x = new_groups, y=net_sales_usd, fill = region )) + 
+#   geom_bar(stat="identity")
+
+
+
 
 ```
+
+# Function
+1. 
+
+```{r}
+count_occurencies <- function(data, ...) {
+  result <-data %>%
+    group_by(...) %>%
+    summarise(numb = n()) %>%
+    mutate(perc_group = numb/sum(numb)) %>%
+    ungroup() %>%
+    mutate(perc_ungroup = numb/sum(numb))
+  return(result)
+}
+
+
+
+
+count_returns_usd <- function(data,...) {
+  result <- data %>%
+    group_by(...) %>%
+    summarise(numb = n(), sum_net = sum(returns_usd)) %>%
+    mutate(sum_ret_group_perc = sum_net/sum(sum_net)) %>%
+    ungroup() %>%
+    mutate(sum_ret_ungroup = sum_net/sum(sum_net))
+}
+  
+
+
+
+
+
+```
+
+# Add currency data
+
+```{r}
+test <- game_is_promo %>%
+  filter(net_units_sold >= 0, net_units_sold <= 1, currency %in% c("EUR","USD")) %>%
+  mutate(
+         unit_usd = if_else(near(net_sales_usd,0), gross_sales_usd/gross_units_sold, net_sales_usd/net_units_sold),
+         test = near(unit_usd, sale_price),
+         usd_course = sale_price/unit_usd
+         ) %>%
+  select(-platform)
+  arrange(currency)
+  
+test_sample <- sample_n(game_is_promo, 500)
+
+
+test_sample <- test_sample %>%
+  arrange(currency) %>%
+  mutate(
+    net_sales_curr = sale_price*net_units_sold,
+    one_usd_curr = net_sales_curr/net_sales_usd
+  )
+
+
+test_ret_zero <- test_sample %>%
+  filter(!(near(returns_usd,0))) %>%
+  mutate(
+    vat_tax_usd = currency(vat_tax_usd),
+    net_sales_usd = currency(net_sales_usd),
+    returns_usd = currency(returns_usd),
+    gross_sales_usd = currency(gross_sales_usd),
+    stawka = round(as.numeric(-vat_tax_usd/net_sales_usd),2),
+    gross_sales_curr = round((sale_price*net_units_sold)*(1+stawka),2)
+         ) %>%
+  arrange(country_code,date)
+```
+
+
 
