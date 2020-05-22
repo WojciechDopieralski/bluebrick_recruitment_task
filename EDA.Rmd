@@ -6,6 +6,8 @@ output: html_notebook
 # Load packages
 
 ```{r}
+#devtools::install_github("hrbrmstr/waffle")
+
 # Data wrangling
 library(tidyverse)
 library(janitor)
@@ -13,6 +15,10 @@ library(janitor)
 library(readxl)
 # Fro currency
 library(formattable)
+#for cahrts
+library(waffle)
+library(hrbrthemes)
+library(ggpubr)
 
 ```
 
@@ -23,6 +29,16 @@ raw_game_data <- readxl::read_xlsx("raw_data/Recrutiment task - data set.xlsx")
 
 glimpse(raw_game_data)
 ```
+
+# Check if data set contains any NA
+1. Data set is "full".
+2. From glimpse: We got some categorical variables all of the are nominal (or if it comes to games industry we could make some order in platform)
+
+
+```{r}
+colSums(is.na(raw_game_data))
+```
+
 
 #Data cleaning
 1. Clean col names with janitor (make em more "R way")
@@ -51,7 +67,8 @@ game_is_promo <- data_column_choice %>%
   select(-country) %>%
   mutate(
     is_promo = !(near(base_price, sale_price)),
-    discount = ifelse(is_promo, round((1-(sale_price/base_price))*100),0)
+    discount = ifelse(is_promo, round((1-(sale_price/base_price))*100),0),
+    sales_season = as.factor(ifelse(date < '2017-02-02',1,2))
   ) %>%
   arrange(country_code)
 
@@ -60,6 +77,17 @@ first_sales <- game_is_promo %>%
 
 second_sales <- game_is_promo %>%
   filter(date > '2017-02-02')
+
+game_is_promo %>%
+  summarise_all(how_many_na)
+```
+
+$ Quick summary after cleaning
+
+```{r}
+game_is_promo %>% 
+    select_if(is.numeric) %>%
+    summary()
 ```
 
 # Grouping data 
@@ -77,22 +105,6 @@ discount_by_platform <- first_sales %>%
 
 discount_by_platform_whole_data <- count_occurency_of_platform(game_is_promo, platform, discount)
 
-
-
-test_fun <- count_param(first_sales,x = returns_usd, platform, discount)
-
-count_param <- function(data, x, ...) {
-  col_name <- enquo(x)
-  
-  result <- data %>%
-    group_by(...) %>%
-    summarise(numb = n(), sum_net = sum(!!col_name)) %>%
-    mutate(count_sum_group = sum_net/sum(sum_net)) %>%
-    ungroup() %>%
-    mutate(count_sum_ungroup = sum_net/sum(sum_net))
-}
-
-
 discount_new_group <- game_is_promo %>%
   mutate(new_groups = case_when(
     discount == 0 ~ "0",
@@ -105,10 +117,69 @@ discount_new_group <- game_is_promo %>%
 
 # ggplot(discount_new_group, aes(x = new_groups, y=net_sales_usd, fill = region )) + 
 #   geom_bar(stat="identity")
+```
+
+# Custom themes
+
+
+```{r}
+
+waffle_theme_custom <- theme(
+     plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+     plot.subtitle = element_text(hjust = 0.5, size = 9, face = "italic"),
+     panel.background = element_rect(fill = "transparent", colour = NA),
+     legend.text = element_text(hjust = 0.5, size = 9),
+     legend.title = element_blank(),
+     legend.key = element_rect(size = 5),
+     legend.position = "bottom",
+     legend.justification = "center",
+     axis.ticks = element_blank(),
+     plot.margin=unit(c(0,0,0,0), "mm")
+   )
+
+
+```
+
+#Qucik drawing
+1. Histogram of values w.o grouping (hipo: will be right skewed)
+2. Pie chart (if possible - we'll see) of platform. (hipo: Most transactions will be on Windows, and most revenu will come from Windows).
 
 
 
+```{r}
+ggplot(game_is_promo, aes(x = log(net_sales_usd), fill = platform)) +
+  geom_histogram()
 
+plat_numb_trans_whole <- count_occurencies(game_is_promo, platform) %>%
+  mutate(ypos = cumsum(perc_group) - perc_group/25,
+         perc_chart = percent(perc_group),
+         waffle_chart = round(perc_group*100))
+
+plat_numb_trans_s1 <- create_waffle_count(first_sales, count_occurencies, platform)
+plat_numb_trans_s2 <- create_waffle_count(second_sales, count_occurencies, platform)
+
+plat_sales_whole <- create_waffle_sales(game_is_promo, count_param, net_sales_usd, platform)
+plat_sales_s1 <- create_waffle_sales(first_sales, count_param, net_sales_usd, platform)
+plat_sales_s2 <- create_waffle_sales(second_sales, count_param, net_sales_usd, platform)
+
+both_promo_waffle <- ggplot(plat_numb_trans_whole, aes(fill = platform, values = waffle_chart)) +
+  geom_waffle(n_rows = 10, size = 0.33, colour = "white", flip = TRUE) +
+  labs(title="percentage of transactions in both sales", 
+       subtitle="divided by platform") +
+  coord_equal() +
+  theme_enhance_waffle() +
+  theme(panel.background = element_rect(fill = "transparent", colour = NA)) +
+  waffle_theme_custom
+
+first_promo_waffle <- create_waffle_chart(plat_numb_trans_s1, platform, waffle_chart, 
+                                          "percentage of transactions in first sales")
+
+second_promo_waffle <- create_waffle_chart(plat_numb_trans_s2, platform, waffle_chart, 
+                                          "percentage of transactions in second sales",
+                                          caption = "1 square == 1pp")
+   
+ggarrange(both_promo_waffle, first_promo_waffle, second_promo_waffle, 
+          ncol=3, common.legend = TRUE, legend = "bottom")
 ```
 
 # Function
@@ -125,20 +196,50 @@ count_occurencies <- function(data, ...) {
   return(result)
 }
 
-
-
-
-count_returns_usd <- function(data,...) {
+count_param <- function(data, col_to_sum, ...) {
+  col_name <- enquo(col_to_sum)
   result <- data %>%
     group_by(...) %>%
-    summarise(numb = n(), sum_net = sum(returns_usd)) %>%
-    mutate(sum_ret_group_perc = sum_net/sum(sum_net)) %>%
+    summarise(numb = n(), sum_net = sum(!!col_name)) %>%
+    mutate(count_sum_group = sum_net/sum(sum_net)) %>%
     ungroup() %>%
-    mutate(sum_ret_ungroup = sum_net/sum(sum_net))
+    mutate(count_sum_ungroup = sum_net/sum(sum_net))
 }
-  
+
+create_waffle_chart <- function(data, fill, values, title, caption = NULL) {
+  ggplot(data, aes(fill = {{fill}}, values = {{values}})) +
+  geom_waffle(n_rows = 10, size = 0.33, colour = "white", flip = TRUE) +
+  labs(title=title, 
+       subtitle="divided by platform",
+       caption=caption) +
+  coord_equal() +
+  theme_enhance_waffle() +
+  waffle_theme_custom
+}
+
+create_waffle_count <- function(data, fun_name, ...) {
+  fun_name(data, ...) %>%
+  mutate(perc_chart = percent(perc_group),
+         waffle_chart = round(perc_group*100))
+}
+
+create_waffle_sales <- function(data, fun_name, ...) {
+  fun_name(data, ...) %>%
+  mutate(perc_chart = percent(count_sum_group),
+         waffle_chart = round(count_sum_group*100))
+}
+```
+
+# Unused plots:
+1. Pie chart - looking bad, many troubles, and way less informative than waffle chart 
 
 
+```{r}
+ggplot(plat_numb_trans_whole, aes(x="", y=perc_group, fill=platform)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0) + 
+  theme_void() + 
+  scale_fill_brewer(palette="Set1")
 
 
 
@@ -166,7 +267,6 @@ test_sample <- test_sample %>%
     net_sales_curr = sale_price*net_units_sold,
     one_usd_curr = net_sales_curr/net_sales_usd
   )
-
 
 test_ret_zero <- test_sample %>%
   filter(!(near(returns_usd,0))) %>%
