@@ -30,3 +30,17 @@ simple_line_theme <- theme(
   plot.margin=unit(c(1,1,1,1), "lines"),
   plot.caption = element_text(hjust = 1, face = "italic"),
 )
+
+simple_bar_theme <- theme(
+  plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+  plot.subtitle = element_text(hjust = 0.5, size = 10, face = "italic"),
+  axis.text.x = element_text(angle = 90, hjust = 1, size = 8, face = "bold"),
+  axis.text.y = element_text(face ="italic"),
+  legend.text = element_text(hjust = 0.5, size = 9),
+  legend.title = element_blank(),
+  legend.justification = "center",
+  axis.title = element_text(hjust = 0.5, size = 10, face = "bold"),
+  panel.background = element_rect(fill = "transparent", colour = NA),
+  plot.margin=unit(c(1,1,1,1), "lines"),
+  plot.caption = element_text(hjust = 1, face = "italic"),
+)

@@ -43,10 +43,10 @@ colSums(is.na(raw_game_data))
 
 #Data cleaning
 1. Clean col names with janitor (make em more "R way")
-2. Show number of unique values in every column 
-3. Remove columns containing only 1 value. Create factor columns for further analysis. 
+2. Show number of unique values in every column
+3. Remove columns containing only 1 value. Create factor columns for further analysis.
 4. Create Map table with country code and country name.
-5. Create column that shows if game is promoted (near is better than "==" cos of floats.). Add % of discount in country curr
+5. Create a column that shows if game is promoted (near is better than "==" cos of floats.). Add % of discount in-country curr
 6. Split data set by years 
 
 ```{r}
@@ -91,7 +91,7 @@ game_is_promo %>%
   summarise_all(how_many_na)
 ```
 
-$ Quick summary after cleaning
+# Quick summary after cleaning
 
 ```{r}
 game_is_promo %>% 
@@ -99,8 +99,9 @@ game_is_promo %>%
     summary()
 ```
 
-# Grouping data 
-1. Group data by platform 
+# Grouping data
+1. Group data by platform
+2. Create additional groups for discount - dropped in the process - useless conception. 
 
 ```{r}
 options(scipen = 999)
@@ -125,7 +126,10 @@ discount_new_group <- game_is_promo %>%
    )
 ```
 
-
+# Check discount in winter sales
+1. Filter data
+2. Use custom function for proper grouping and count.
+3. Check unusual discount 
 
 ```{r}
 sales_period <- game_is_promo %>%
@@ -159,7 +163,7 @@ test_price <- sales_period %>%
 
 # Custom themes
 1. theme for waffle chart.
-2. Theme for siple line plot that will be converted to plotly objects. 
+2. The theme for simple line plot that will be converted to plotly objects. 
 
 ```{r}
 waffle_theme_custom <- theme(
@@ -194,13 +198,26 @@ simple_line_theme <- theme(
      plot.margin=unit(c(1,1,1,1), "lines"),
      plot.caption = element_text(hjust = 1, face = "italic"),
    )
+
+simple_bar_theme <- theme(
+     plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+     plot.subtitle = element_text(hjust = 0.5, size = 10, face = "italic"),
+     axis.text.x = element_text(angle = 90, hjust = 1, size = 8, face = "bold"),
+     axis.text.y = element_text(face ="italic"),
+     legend.text = element_text(hjust = 0.5, size = 9),
+     legend.title = element_blank(),
+     legend.justification = "center",
+     axis.title = element_text(hjust = 0.5, size = 10, face = "bold"),
+     panel.background = element_rect(fill = "transparent", colour = NA),
+     plot.margin=unit(c(1,1,1,1), "lines"),
+     plot.caption = element_text(hjust = 1, face = "italic"),
+   )
 ```
 
-#Qucik drawing
-1. Histogram of values w.o grouping (hipo: will be right skewed)
-2. Pie chart (if possible - we'll see) of platform. (hipo: Most transactions will be on Windows, and most revenu will come from Windows).
-
-
+#Draw line plots:
+1. Create proper data set for plotting.
+2. Create one test plot, then convert it to function.
+3. Use function with different parameters.  
 
 ```{r}
 date_group <- game_is_promo %>%
@@ -243,10 +260,12 @@ basic_line_season(unit_net_rev)
 # Some tests
 1. We'll chech if sales distribution (number of net sales) are identical in both seasons (2 months period)
 - H0: Populations are the same in both seasons. p-value = 0.75 so we can't reject the null hypothesis
-2. We'll check if netto revenue distribution (sum of netto revenue) are identical in both sales. 
+2. Create data sets for further tests.
+3. We'll check if netto revenue distribution (sum of netto revenue) are identical in both sales. 
+4. Check some density and box plots. 
 
 ```{r}
-#test whole period.
+#test whole period.H0: NOT rejected
 wilcox.test(sum_net_sales ~ sales_season, data=date_group)
 
 only_ws_data <- date_group %>%
@@ -270,12 +289,12 @@ only_no_ws_data <- date_group %>%
   
 
 
-#Check distribution of revenues in both sales period.
+#Check distribution of revenues in both sales period. H0: rejected.
 wilcox.test(sum_promo_rev ~ winter_sales, data=only_ws_data)
-#Check distribution of rates of revenues in both sales period.
+#Check distribution of rates of revenues in both sales period. H0: NOT rejected
 wilcox.test(rev_promo_rate ~ winter_sales, data=only_ws_data)
 
-#Check distribution of revenues in no sales period
+#Check distribution of revenues in no sales period. H0: NOT rejected
 wilcox.test(sum_norm_rev ~ sales_season, data=only_no_ws_data)
 
 
@@ -292,17 +311,14 @@ ggplot(only_ws_data, aes(x = rev_promo_rate, color = winter_sales)) +
 ggplot(only_no_ws_data, aes(x = sum_norm_rev, color = sales_season)) +
   geom_density()
 
-
 ggplot(only_no_ws_data, aes(x = sum_norm_rev)) +
   geom_histogram(bins = 8) +
   facet_grid(~ sales_season)
 
-
-
 basic_line_season(rev_promo_rate, data = only_ws_data, "Plot 2. Netto Revenue from products on promotion in USD", "Netto revenue in USD")
 ```
 
-# 
+# Create Pie charts.
 
 ```{r}
 test_pie <- ggplot(plat_numb_trans_whole, aes(x="", y=perc_group, fill=platform)) +
@@ -329,6 +345,60 @@ fig <- fig %>% layout(title = "", showlegend = T,
                       yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 fig
+```
+
+# Create table 
+
+```{r}
+count_param(date_group, sum_net_sales, sales_season, winter_sales) %>%
+  mutate(count_sum_group = percent(count_sum_group),
+         count_sum_ungroup = percent(count_sum_ungroup)) %>%
+  rename("Sales Season" = sales_season, "Winter Sales" = winter_sales, Duration = numb, "Copies Sold" = sum_net, 
+         "Perc inside group" = count_sum_group, "Perc without gruping" = count_sum_ungroup)
+```
+
+# region analysis
+1. Prepare the data
+2. Draw bar plot. 
+
+```{r}
+region_revenue <- game_is_promo %>%
+  group_by(sales_season, winter_sales, region) %>%
+  summarise(sum_rev = sum(net_sales_usd)) %>%
+  mutate(rev_group_perc = sum_rev/sum(sum_rev)) %>%
+  ungroup() %>%
+  mutate(rev_group_perc = percent(rev_group_perc)) %>%
+  mutate(rev_ungroup_perc = percent(sum_rev/sum(sum_rev))) %>%
+  arrange(sales_season, winter_sales, desc(rev_group_perc))
+  
+region_sales <- game_is_promo %>%
+  group_by(sales_season, winter_sales, region) %>%
+  summarise(sum_net_sales = sum(net_units_sold)) %>%
+  mutate(copy_sales_group_perc = sum_net_sales/sum(sum_net_sales)) %>%
+  ungroup() %>%
+  mutate(copy_sales_group_perc = percent(copy_sales_group_perc)) %>%
+  mutate(copy_sales_ungroup_perc = percent(sum_net_sales/sum(sum_net_sales))) %>%
+  arrange(sales_season, winter_sales, desc(copy_sales_group_perc))
+
+region_rev_whole_year <- region_revenue %>%
+  group_by(region, sales_season) %>%
+  summarise(sum_rev = sum(sum_rev), perc = sum(rev_ungroup_perc))
+ 
+ 
+
+draw_simple_bar <- function(data, y_val, title = "add title", ylab_title = "add_y_lab_name") {
+  simple_bar <- ggplot(data, aes(x = reorder(region, -{{y_val}}), y = {{y_val}})) +
+    geom_bar(stat="identity") +
+    labs(title=title,
+         x = "Regions",
+         y = ylab_title) +
+    simple_bar_theme 
+  
+  ret_obj <- ggplotly(simple_bar)
+  return(ret_obj)
+}
+
+draw_simple_bar(region_rev_whole_year, perc)
 ```
 
 # Draw waffle chart for raport. 
@@ -394,12 +464,41 @@ ann_trans <- annotate_figure(p = arrange_trans, top = text_grob("Waffle charts i
 
 ann_revenues <- annotate_figure(p = arrange_revenues,bottom = text_grob("1 square == 1pp", color = "blue", hjust = 1, x = 1, face = "italic", size = 8))
 
+
+
 ann_trans
 arrange_sold_copies
 ann_revenues
 ```
 
-# Function
+# 
+
+```{r}
+
+# game_is_promo %>%
+#   group_by(sales_season, winter_sales, platform) %>%
+#   summarise(numb = n(), sum_rev = sum(net_sales_usd), sum_net_sales = sum(net_units_sold)) %>%
+#   mutate(rev_group_perc = sum_rev/sum(sum_rev), copy_sales_group_perc = sum_net_sales/sum(sum_net_sales)) %>%
+#   ungroup() %>%
+#   mutate(rev_group_perc = percent(rev_group_perc), copy_sales_group_perc = percent(copy_sales_group_perc)) %>%
+# summarise(numb = n(), sum_revenu = sum(net_sales_usd), sum_net_sales = sum(net_units_sold), 
+#             sum_ret = sum(returns), mean_reve = mean(net_sales_usd), sum_promo_rev = sum(promo_rev), 
+#             sum_norm_rev = sum(normal_rev), ret_to_sell = sum_ret/sum_net_sales, unit_net_rev = sum_revenu/sum_net_sales) %>%
+#   mutate(sales_season = as.factor(ifelse(date < '2017-02-02',1,2)),
+#          day_month = format(date, "%m-%d")) %>%
+#   arrange(date) %>%
+#   mutate(id = row_number()) %>%
+#   ungroup() %>%
+#   mutate(day_month = fct_reorder(day_month,id),
+#          winter_sales = as.factor(ifelse(date > '2016-12-22' & date < '2017-01-03',
+#                                     "ws1",
+#                                     ifelse(date > '2017-12-21' & date < '2018-01-04',
+#                                            "ws2",
+#                                            "no_ws"))))
+
+```
+
+# Functions
 1. 
 
 ```{r}
@@ -474,7 +573,7 @@ ggplot(plat_numb_trans_whole, aes(x="", y=perc_group, fill=platform)) +
   scale_fill_brewer(palette="Set1")
 ```
 
-# Add currency data
+# Add currency data (unused - bad concept)
 
 ```{r}
 test <- game_is_promo %>%
@@ -508,6 +607,7 @@ test_ret_zero <- test_sample %>%
     gross_sales_curr = round((sale_price*net_units_sold)*(1+stawka),2)
          ) %>%
   arrange(country_code,date)
+
 ```
 
 

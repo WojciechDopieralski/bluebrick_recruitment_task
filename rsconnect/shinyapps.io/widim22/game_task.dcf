@@ -1,0 +1,10 @@
+name: game_task
+title:
+username:
+account: widim22
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2349893
+bundleId: 3184909
+url: https://widim22.shinyapps.io/game_task/
+when: 1590345706.83893

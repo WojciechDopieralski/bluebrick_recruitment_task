@@ -31,6 +31,12 @@ game_is_promo <- data_column_choice %>%
   ) %>%
   arrange(country_code)
 
+first_sales <- game_is_promo %>%
+  filter(date < '2017-02-02')
+
+second_sales <- game_is_promo %>%
+  filter(date > '2017-02-02')
+
 sales_period <- game_is_promo %>%
   filter(winter_sales != "no_ws", is_promo == T)
 
@@ -69,4 +75,21 @@ data_pie_chart_s1 <- date_group %>%
 
 data_pie_chart_s2 <- date_group %>%
   filter(sales_season == 2)
+
+region_revenue <- game_is_promo %>%
+  group_by(sales_season, winter_sales, region) %>%
+  summarise(sum_rev = sum(net_sales_usd)) %>%
+  mutate(rev_group_perc = sum_rev/sum(sum_rev)) %>%
+  ungroup() %>%
+  mutate(rev_group_perc = percent(rev_group_perc)) %>%
+  mutate(rev_ungroup_perc = percent(sum_rev/sum(sum_rev)))
+
+
+region_sales <- game_is_promo %>%
+  group_by(sales_season, winter_sales, region) %>%
+  summarise(sum_net_sales = sum(net_units_sold)) %>%
+  mutate(copy_sales_group_perc = sum_net_sales/sum(sum_net_sales)) %>%
+  ungroup() %>%
+  mutate(copy_sales_group_perc = percent(copy_sales_group_perc)) %>%
+  mutate(copy_sales_ungroup_perc = percent(sum_net_sales/sum(sum_net_sales)))
 

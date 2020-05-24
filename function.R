@@ -108,3 +108,15 @@ basic_line_season <- function (y_val, title ="add title", ylab_title = "name_lab
   
   return(ret_obj)
 }
+
+draw_simple_bar <- function(data, y_val, title = "add title", ylab_title = "add_y_lab_name") {
+  simple_bar <- ggplot(data, aes(x = reorder(region, -{{y_val}}), y = {{y_val}})) +
+    geom_bar(stat="identity") +
+    labs(title=title,
+         x = "Regions",
+         y = ylab_title) +
+    simple_bar_theme 
+  
+  ret_obj <- ggplotly(simple_bar)
+  return(ret_obj)
+}
