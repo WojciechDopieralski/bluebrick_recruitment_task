@@ -9,7 +9,6 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 
-
 # Data wrangling
 library(tidyverse)
 library(janitor)
@@ -17,38 +16,75 @@ library(janitor)
 library(readxl)
 # Fro currency
 library(formattable)
-#for cahrts
+#for charts
 library(waffle)
 library(hrbrthemes)
 library(ggpubr)
 library(plotly)
 library(ggiraph)
-library(corrgram)
-#custom functions
+library(shiny)
+library(kableExtra)
+#custom dependencies 
 source("function.R")
+source("theme.R")
+source("data_preparation.R")
 ```
 ## Introduction
 
 Hi, as you probably already know my name is Wojtek and I'm grateful for the possibility to take part in this recruitment. The task was cool, 
-and I had a lot of fun during the analysis. My whole analysis was conducted with R, which is my primaryprograming language. At the end of this report you can find link to github with my code (for better readability). Enjoy your reading ;)
+and I had a lot of fun during the analysis. My whole analysis was conducted with R, which is my primaryprograming language. At the end of this report you can find link to github with <br /> my code (for better readability). I will use "[]" syntax for in-text comments. Enjoy your reading ;)
 
 ## Basic information
 
 Provided data set contains 19 columns and 0 missing values, which is very good information for further movements. After some basic exploratory data analysis (EDA) I decided to remove 3 columns that contained only one unique value (Package, Product(ID#), Product Name). I will assess sales of game caled "SAMPLE PRODUCT" with id 91203 from package -1. Data set contain a few usefull categorical variables (nominal variable). These are: Platform, Country, Region, Currency. In general we can't order there categories (I would risk a statement that in the game industry we can order platform, because most PC developers produce games for Windows OS). 
 
-## Sales Period and fidcount
+## Sales Period and discount
 
-First task was to determinate sales period. I assume that sales periods were differen in both years. First sale took place from 2016-12-22 to 2017-01-02 (so it last 12 days). Second sale took place from 2017-12-21 to 2018-01-03 (so it last 14 days). Also some 1 day sale took place at 2017-12-09. To ilustrate and prove that I draw plot 1. 
+First task was to determinate sales period. I assume that sales periods were differen in both years. First sale took place from 2016-12-22 to 2017-01-02 (so it last 12 days). Second sale took place from 2017-12-21 <br /> to 2018-01-03 (so it last 14 days). Also some 1 day small sale took place at 2017-12-09. To ilustrate and prove that I draw <b>plot 1</b>. 
 
-```{r bar_plot_sales_periods, echo=FALSE}
-basic_line_season(sum_promo_rev, "Plot 1. Netto Revenue in USD during winter sales divided be season", "Netto revenue in USD")
+```{r line_plot_sales_periods, echo=FALSE}
+div(basic_line_season(sum_promo_rev, "Plot 1. Netto Revenue from products on promotion in USD devided by season", "Netto revenue in USD"), align = "center")
 ```
 
-## Including Plots
+In both sales peak of revenu was achived at 25th od December. I assume that it's because people (especially young ones) spends money from Christmas presents. It's also important to notice that sales jumps are extremely large at the begining of the promotion regardless of season. In first sale we can also see second local maximum at 30th of December. We can see growth rates of revenues in both sales period on <b>plot 2</b>.
 
-You can also embed plots, for example:
+```{r line_plot_rev_growth_rate, echo=FALSE}
+div(basic_line_season(rev_promo_rate, df_data = only_ws_data, "Plot 2. Growth rates of netto revenues during sales", "Growth rates"), align = "center")
+```
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+It is also important to consider if distributions between two sales periods are identical [to test this I conducted Mann-Whitney U (Wilcoxon Rank Sum) test]. When comparing Netto revenues from winter sales we assume that they're differen [H0 was rejected], but if we compare growth rates we assume that distributions are equals [No reason to reject H0].
+
+In microeconomics the most important thing that is responsible for product success is price. Winter sales are known for their amazing discounts. In terms to this product the discounts applied during promotion were presented in <b>table 1</b>.
+```{r discount_table, echo = FALSE}
+count_occurencies(sales_period, winter_sales, discount) %>%
+  group_by(winter_sales) %>%
+  top_n(1, wt = numb) %>%
+  select(winter_sales, discount) %>%
+  rename(Discount = discount, "Sales Season" = winter_sales) %>%
+  knitr::kable(caption = '<b>Table 1. Discounts applied during winter sales in percents</b>')
+```
+
+Discount during winter sales 2016/2017 was 32% and discount during winter sales 2017/2018 was 40%. This fact seems logic for most products in games industry - the older game get, the higher discount is applied (with few exceptions [confirming the rule ;)]). Mean unit price [counter as mean of Netto Revenue in USD divided by Netto sales grouped by dates] during first winter sale including data from all countries was 15.59 USD ($22.93 w.o discount). In second sale it was equal to 12.96 USD ($21.6 w.o discount). From my personal experience I would say that this game keeps its price.  
+
+Next important question would be "How did the discount changed sales during considered period"? The best answer for this question is <b>line plot 3</b> which contains information about total netto revenue from 1st December to  31st January. 
+
+```{r line_plot_total_net_rev, echo=FALSE}
+div(basic_line_season(sum_revenu, "Plot 3. Netto Revenue from product in USD devided by season", "Netto revenue in USD"), align = "center")
+```
+
+Presented data shows that discounts have huge impact on Netto Revenues. Even small discount that took place at the begging of second season made revenues near three times bigger then year before. To vizualize this impacts I will compare money earned during winter sale with money earned without discount. It's important to notice that winter sales period is only ~19% of annalysed time in season one and about ~22.5% in season two. 
+
+```{r pie_chart_with_rev, echo=FALSE}
+fig <- plot_ly()
+
+fig <- fig %>% add_pie(data = data_pie_chart_s1, labels = ~winter_sales, values = ~sum_revenu, name = "2016/2017", domain = list(row = 0, column = 0))
+fig <- fig %>% add_pie(data = data_pie_chart_s2, labels = ~winter_sales, values = ~sum_revenu, name = "2016/2018", domain = list(row = 0, column = 1))
+
+fig <- fig %>% layout(title = "<b>Plot 4. Netto Revenues grouped by winter sale</b>", showlegend = T, 
+                      legend = list(title=list(text='<b>Sales option:</b>')), grid=list(rows=1, columns=2),
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+div(fig, align = "center")
 ```
 

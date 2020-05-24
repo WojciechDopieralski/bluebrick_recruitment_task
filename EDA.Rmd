@@ -131,7 +131,11 @@ discount_new_group <- game_is_promo %>%
 sales_period <- game_is_promo %>%
   filter(winter_sales != "no_ws", is_promo == T)
 
-count_occurencies(sales_period, winter_sales, discount)
+count_occurencies(sales_period, winter_sales, discount) %>%
+  group_by(winter_sales) %>%
+  top_n(1, wt = numb) %>%
+  select(winter_sales, discount) %>%
+  rename(Discount = discount, "Sales Season" = winter_sales)
 
 check_disc_42 <- sales_period %>%
   filter(winter_sales == "ws1", discount == 42)
@@ -150,8 +154,6 @@ test_price <- sales_period %>%
   group_by(region) %>%
   summarise(mean_price = mean(unit_net_price_usd))
 
-#Funckja tu. 
-test <- 
 
 ```
 
@@ -231,41 +233,102 @@ plotly_ojb <- ggplotly(t)
 plotly_ojb %>% 
   layout(legend = list(title=list(text='<b> Sales Season </b>')))
 
-
 basic_line_season(sum_norm_rev)
 basic_line_season(sum_net_sales)
 basic_line_season(sum_ret)
 basic_line_season(ret_to_sell)
 basic_line_season(unit_net_rev)
-
-
-
-
-
-  layout(legend = list(title=list(text='<b> Sales Season </b>')))
-  
 ```
 
 # Some tests
-1. We'll chech if sales distribution (number of net sales) are identical in both seasons
+1. We'll chech if sales distribution (number of net sales) are identical in both seasons (2 months period)
 - H0: Populations are the same in both seasons. p-value = 0.75 so we can't reject the null hypothesis
-2. 
+2. We'll check if netto revenue distribution (sum of netto revenue) are identical in both sales. 
 
 ```{r}
-wilcox.test(sum_net_sales ~ sales_season, data=date_group) 
+#test whole period.
+wilcox.test(sum_net_sales ~ sales_season, data=date_group)
 
-filter_data <- date_group %>%
-  filter(winter_sales != "no_ws")
+only_ws_data <- date_group %>%
+  filter(winter_sales != "no_ws") %>%
+  group_by(winter_sales) %>%
+  mutate(rev_promo_rate = round(sum_promo_rev/lag(sum_promo_rev) * 100,2)) %>%
+  ungroup()
 
-wilcox.test(sum_net_sales ~ winter_sales, data=filter_data) 
+mean_price <- only_ws_data %>%
+  group_by(winter_sales) %>%
+  summarise(mean_unit = round(mean(unit_net_rev),2)) %>%
+  ungroup() %>%
+  mutate(discount = c(0.32,0.4),
+         norm_price = round((mean_unit/(1-discount)),2))
+
+only_no_ws_data <- date_group %>%
+  filter(winter_sales == "no_ws") %>%
+  group_by(sales_season) %>%
+  mutate(rev_growth_rate = round(sum_norm_rev/lag(sum_norm_rev) * 100,2)) %>%
+  ungroup()
+  
 
 
-ggplot(filter_data, aes(x = sum_net_sales, group = winter_sales)) +
-  geom_boxplot()
+#Check distribution of revenues in both sales period.
+wilcox.test(sum_promo_rev ~ winter_sales, data=only_ws_data)
+#Check distribution of rates of revenues in both sales period.
+wilcox.test(rev_promo_rate ~ winter_sales, data=only_ws_data)
+
+#Check distribution of revenues in no sales period
+wilcox.test(sum_norm_rev ~ sales_season, data=only_no_ws_data)
+
+
+ggplot(only_ws_data, aes(x = rev_promo_rate)) +
+  geom_histogram(bins = 6) +
+  facet_grid(~ winter_sales)
 
 ggplot(date_group, aes(x = sum_net_sales, group = sales_season)) +
   geom_boxplot()
 
+ggplot(only_ws_data, aes(x = rev_promo_rate, color = winter_sales)) +
+  geom_density()
+
+ggplot(only_no_ws_data, aes(x = sum_norm_rev, color = sales_season)) +
+  geom_density()
+
+
+ggplot(only_no_ws_data, aes(x = sum_norm_rev)) +
+  geom_histogram(bins = 8) +
+  facet_grid(~ sales_season)
+
+
+
+basic_line_season(rev_promo_rate, data = only_ws_data, "Plot 2. Netto Revenue from products on promotion in USD", "Netto revenue in USD")
+```
+
+# 
+
+```{r}
+test_pie <- ggplot(plat_numb_trans_whole, aes(x="", y=perc_group, fill=platform)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0) + 
+  theme_void() + 
+  scale_fill_brewer(palette="Set1")
+
+
+data_pie_chart_s1 <- date_group %>%
+  filter(sales_season == 1)
+  
+data_pie_chart_s2 <- date_group %>%
+  filter(sales_season == 2)
+  
+fig <- plot_ly()
+
+fig <- fig %>% add_pie(data = data_pie_chart_s1, labels = ~winter_sales, values = ~sum_revenu, name = "S1", domain = list(row = 0, column = 0))
+fig <- fig %>% add_pie(data = data_pie_chart_s2, labels = ~winter_sales, values = ~sum_revenu, name = "S2", domain = list(row = 0, column = 1))
+
+fig <- fig %>% layout(title = "", showlegend = T,
+                      grid=list(rows=1, columns=2),
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+fig
 ```
 
 # Draw waffle chart for raport. 
@@ -382,8 +445,8 @@ create_waffle_param <- function(data, fun_name, ...) {
          waffle_chart = round(count_sum_group*100))
 }
 
-basic_line_season <- function (y_val, title ="add title", ylab_title = "name_lab") {
-ggplot_obj <- ggplot(date_group, aes(x = day_month, y = {{y_val}}, group = sales_season, colour = sales_season)) +
+basic_line_season <- function (y_val, data = "date_group", title ="add title", ylab_title = "name_lab") {
+ggplot_obj <- ggplot(data, aes(x = day_month, y = {{y_val}}, group = sales_season, colour = sales_season)) +
   geom_line() +
   geom_point() +
   labs(title=title,
@@ -394,7 +457,7 @@ ggplot_obj <- ggplot(date_group, aes(x = day_month, y = {{y_val}}, group = sales
 plotly_ojb <- ggplotly(ggplot_obj) 
 
 ret_obj <- plotly_ojb %>% 
-  layout(legend = list(title=list(text='<b> Sales Season </b>')))
+  layout(legend = list(title=list(text='<b>Sales Season:</b>')))
 
 return(ret_obj)
 }
