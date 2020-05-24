@@ -1,0 +1,54 @@
+---
+title: <center>Winter Sale analysis report</center>
+author: <center>Wojciech Dopieralski</center>
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+
+# Data wrangling
+library(tidyverse)
+library(janitor)
+# Data loading/saving
+library(readxl)
+# Fro currency
+library(formattable)
+#for cahrts
+library(waffle)
+library(hrbrthemes)
+library(ggpubr)
+library(plotly)
+library(ggiraph)
+library(corrgram)
+#custom functions
+source("function.R")
+```
+## Introduction
+
+Hi, as you probably already know my name is Wojtek and I'm grateful for the possibility to take part in this recruitment. The task was cool, 
+and I had a lot of fun during the analysis. My whole analysis was conducted with R, which is my primaryprograming language. At the end of this report you can find link to github with my code (for better readability). Enjoy your reading ;)
+
+## Basic information
+
+Provided data set contains 19 columns and 0 missing values, which is very good information for further movements. After some basic exploratory data analysis (EDA) I decided to remove 3 columns that contained only one unique value (Package, Product(ID#), Product Name). I will assess sales of game caled "SAMPLE PRODUCT" with id 91203 from package -1. Data set contain a few usefull categorical variables (nominal variable). These are: Platform, Country, Region, Currency. In general we can't order there categories (I would risk a statement that in the game industry we can order platform, because most PC developers produce games for Windows OS). 
+
+## Sales Period and fidcount
+
+First task was to determinate sales period. I assume that sales periods were differen in both years. First sale took place from 2016-12-22 to 2017-01-02 (so it last 12 days). Second sale took place from 2017-12-21 to 2018-01-03 (so it last 14 days). Also some 1 day sale took place at 2017-12-09. To ilustrate and prove that I draw plot 1. 
+
+```{r bar_plot_sales_periods, echo=FALSE}
+basic_line_season(sum_promo_rev, "Plot 1. Netto Revenue in USD during winter sales divided be season", "Netto revenue in USD")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+

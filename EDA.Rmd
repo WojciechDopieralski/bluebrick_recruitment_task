@@ -41,7 +41,6 @@ glimpse(raw_game_data)
 colSums(is.na(raw_game_data))
 ```
 
-
 #Data cleaning
 1. Clean col names with janitor (make em more "R way")
 2. Show number of unique values in every column 
@@ -68,14 +67,15 @@ country_map_table <- data_column_choice %>%
 game_is_promo <- data_column_choice %>%
   select(-country) %>%
   mutate(
+    unit_net_price_usd = net_sales_usd/net_units_sold,
     is_promo = !(near(base_price, sale_price)),
     promo_rev = ifelse(is_promo == T, net_sales_usd,0),
     normal_rev = ifelse(is_promo == F, net_sales_usd,0),
     discount = ifelse(is_promo, round((1-(sale_price/base_price))*100),0),
     sales_season = as.factor(ifelse(date < '2017-02-02',1,2)),
-    winter_sales = as.factor(ifelse(date > '2016-12-21' & date < '2017-01-03',
+    winter_sales = as.factor(ifelse(date > '2016-12-22' & date < '2017-01-03',
                                     "ws1",
-                                    ifelse(date > '2017-12-20' & date < '2018-01-04',
+                                    ifelse(date > '2017-12-21' & date < '2018-01-04',
                                            "ws2",
                                            "no_ws")))
   ) %>%
@@ -141,11 +141,17 @@ check_disc_42 <- sales_period %>%
 #During WS2 discount was at 40%.
 ```
 
-
+# Check by region
 
 ```{r}
 
-test <- count_param(sales_period, net_sales_usd, winter_sales, region)
+test_price <- sales_period %>%
+  filter(!is.nan(unit_net_price_usd )) %>%
+  group_by(region) %>%
+  summarise(mean_price = mean(unit_net_price_usd))
+
+#Funckja tu. 
+test <- 
 
 ```
 
@@ -206,9 +212,9 @@ date_group <- game_is_promo %>%
   mutate(id = row_number()) %>%
   ungroup() %>%
   mutate(day_month = fct_reorder(day_month,id),
-         winter_sales = as.factor(ifelse(date > '2016-12-21' & date < '2017-01-03',
+         winter_sales = as.factor(ifelse(date > '2016-12-22' & date < '2017-01-03',
                                     "ws1",
-                                    ifelse(date > '2017-12-20' & date < '2018-01-04',
+                                    ifelse(date > '2017-12-21' & date < '2018-01-04',
                                            "ws2",
                                            "no_ws"))))
 
@@ -225,7 +231,7 @@ plotly_ojb <- ggplotly(t)
 plotly_ojb %>% 
   layout(legend = list(title=list(text='<b> Sales Season </b>')))
 
-basic_line_season(sum_promo_rev)
+
 basic_line_season(sum_norm_rev)
 basic_line_season(sum_net_sales)
 basic_line_season(sum_ret)
@@ -234,6 +240,10 @@ basic_line_season(unit_net_rev)
 
 
 
+
+
+  layout(legend = list(title=list(text='<b> Sales Season </b>')))
+  
 ```
 
 # Some tests
@@ -384,7 +394,7 @@ ggplot_obj <- ggplot(date_group, aes(x = day_month, y = {{y_val}}, group = sales
 plotly_ojb <- ggplotly(ggplot_obj) 
 
 ret_obj <- plotly_ojb %>% 
-  layout(title=list(text='<b> Sales Season </b>'))
+  layout(legend = list(title=list(text='<b> Sales Season </b>')))
 
 return(ret_obj)
 }
