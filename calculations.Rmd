@@ -381,24 +381,18 @@ region_sales <- game_is_promo %>%
   arrange(sales_season, winter_sales, desc(copy_sales_group_perc))
 
 region_rev_whole_year <- region_revenue %>%
-  group_by(region, sales_season) %>%
+  group_by(region) %>%
   summarise(sum_rev = sum(sum_rev), perc = sum(rev_ungroup_perc))
- 
- 
 
-draw_simple_bar <- function(data, y_val, title = "add title", ylab_title = "add_y_lab_name") {
-  simple_bar <- ggplot(data, aes(x = reorder(region, -{{y_val}}), y = {{y_val}})) +
-    geom_bar(stat="identity") +
-    labs(title=title,
-         x = "Regions",
-         y = ylab_title) +
-    simple_bar_theme 
+region_sales_whole_year <- region_sales %>%
+  group_by(region) %>%
+  summarise(sum_rev = sum(sum_net_sales), perc = sum(copy_sales_ungroup_perc))
+
+
+
+
   
-  ret_obj <- ggplotly(simple_bar)
-  return(ret_obj)
-}
-
-draw_simple_bar(region_rev_whole_year, perc)
+  
 ```
 
 # Draw waffle chart for raport. 
@@ -559,6 +553,18 @@ ret_obj <- plotly_ojb %>%
   layout(legend = list(title=list(text='<b>Sales Season:</b>')))
 
 return(ret_obj)
+}
+
+draw_simple_bar <- function(data, y_val, title = "add title", ylab_title = "add_y_lab_name") {
+  simple_bar <- ggplot(data, aes(x = reorder(region, -{{y_val}}), y = {{y_val}})) +
+    geom_bar(stat="identity") +
+    labs(title=title,
+         x = "Regions",
+         y = ylab_title) +
+    simple_bar_theme 
+  
+  ret_obj <- ggplotly(simple_bar)
+  return(ret_obj)
 }
 ```
 

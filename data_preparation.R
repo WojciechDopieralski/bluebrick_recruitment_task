@@ -93,3 +93,14 @@ region_sales <- game_is_promo %>%
   mutate(copy_sales_group_perc = percent(copy_sales_group_perc)) %>%
   mutate(copy_sales_ungroup_perc = percent(sum_net_sales/sum(sum_net_sales)))
 
+
+region_rev_whole_year <- region_revenue %>%
+  group_by(region) %>%
+  summarise(sum_rev = sum(sum_rev), perc = sum(rev_ungroup_perc))
+
+region_sales_whole_year <- region_sales %>%
+  group_by(region) %>%
+  summarise(sum_rev = sum(sum_net_sales), perc = sum(copy_sales_ungroup_perc))
+
+
+

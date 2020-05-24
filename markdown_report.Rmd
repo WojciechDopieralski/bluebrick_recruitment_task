@@ -137,12 +137,25 @@ game_is_promo %>%
 
 ## Region Analysis
 
+One of the most important categorical data inside provided data set is information about region and country. Regardless of the winter sales it's good to know which regions generate revenues and in which games sales well. It is important to notice that because of exchange differences game can sell very well in a country where currency is weak (in the data game was very cheap in PLN) [normally the differences aren't huge, and if I'm not wrong games have region lock]. Net revenues and net copies sold in percentage are shown on <b>plot 6</b> and <b> plot 7</b>
 
+```{r}
+div(draw_simple_bar(region_rev_whole_year, perc,"Plot 6. Net revenue divided by regions from both seasons" , 
+                    ylab_title = "Revenue percentage"), align = "center")
+div(draw_simple_bar(region_sales_whole_year, perc, "Plot 7. Net revenue divided by regions from both seasons", 
+                    ylab_title = "Copies sold percentage"),  align = "center")
+```
+
+On the charts, you can see that most of the Revenues come from North America  (over 63%). Over 56% of copies were also sold in North America. Then over 21% of revenue comes from Western Europe (with nearly 23% of copies sold). These two regions are the main source of profits from this product.
 
 ## Summary and Recommendation:
 
+- Business performance during analyzed period was pretty good, without sales game sold fairly steadily. Even a 1-day sale significantly increased sales.
+- During winter sale in both year game scored peak of sales quite fast. It's important to notice that during first season sale it has 2 maximum. It would be advisable to search for the reason for this second maximum. 
+- Most of the revenues come from Windows player so we should focus on them. 
+- We got space to grow, if game is a success in NA it's possible to make it huge in Asia. Also if this game has multiplayer, players will recommend it to each other.
 
-
+<center><b>thanks for reading and hope to hear from you soon ;) </b></center>
 
 ## Description and links:
 
@@ -151,11 +164,15 @@ game_is_promo %>%
 
 ## Bonus 1
 
-The most important information would be the name of the game (with name comes type and other characteristics).  With the knowledge about type you can compare game with other of this type (or close ones). It's also very important when it comes to region comparison. Games in Asia (especially in China, South Korea and Japan) are huge (in Japan consoles are way more popular) but Asians are playing specific types of games. In the analysis sales in Asia were super low - there must be some reason for this.
+- The most important information would be the name of the game (with name comes type and other characteristics).  With the knowledge about type you can compare game with other of this type (or close ones). It's also very important when it comes to region comparison. Games in Asia (especially in China, South Korea and Japan) are huge (in Japan consoles are way more popular) but Asians are playing specific types of games. In the analysis sales in Asia were super low - there must be some reason for this.
 
-Information about taxation would be useful. It's better to sell in countries where taxes are lower, it will make net revenues higher.
+- Information about taxation would be useful. It's better to sell in countries where taxes are lower, it will make net revenues higher.
 
-It would be great to have information about sales records from the whole year. I know that for the purpose of recruitment task it has to be cut, but for in-depth analysis longer period would be great.
+- It would be great to have information about sales records from the whole year. I know that for the purpose of recruitment task it has to be cut, but for in-depth analysis longer period would be great.
+
+- I think that idea of creating Shiny app with interactive map divided by countries would be great for this data set. I thought about it (did something like this in my past projects) but because of other responsibilities I ran out of time (as I wrote in e-mail I could start this task at 20-05-2020).
+
+- I also thought about conducting returns analysis. It would be good to know why people return games. 
 
 ## Bonus 2
 
